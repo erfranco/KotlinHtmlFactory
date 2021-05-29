@@ -1,7 +1,7 @@
 package net.ermanno.html
 
 //convenience extension function
-fun <T: Tag> MutableList<in T>.addAndReturn(elem: T): T {
+fun <T: HtmlElem> MutableList<in T>.addAndReturn(elem: T): T {
     this.add(elem)
     return elem
 }
