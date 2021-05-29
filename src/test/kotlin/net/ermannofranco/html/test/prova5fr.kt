@@ -1,6 +1,7 @@
 package net.ermannofranco.html.test
 
 import net.ermanno.html.Fragment
+import net.ermanno.html.MouseEvent
 
 class Prova5(val text: String) : Fragment() {
 
@@ -8,8 +9,9 @@ class Prova5(val text: String) : Fragment() {
         span { text }
         addP()
         div("div1") { "Questo e' il testo" }
-        div(className = "uno").addTextBlock("Testo di prova & di controllo", encode = true)
-        addP()
+        val div = div(className = "uno")
+        div.event(MouseEvent.MOUSEOVER, "this.style.backgroundColor='YELLOW'")
+        div.addTextBlock("Testo di prova & di controllo", encode = true)
 
     }
 }

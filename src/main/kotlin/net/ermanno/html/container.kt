@@ -1,7 +1,7 @@
 package net.ermanno.html
 
 //convenience extension function
-fun <T> MutableList<in T>.addAndReturn(elem: T): T {
+fun <T: Tag> MutableList<in T>.addAndReturn(elem: T): T {
     this.add(elem)
     return elem
 }
@@ -14,8 +14,9 @@ interface HtmlContainer : HtmlElem {
 
     val elements: MutableList<in HtmlElem>
 
-    fun loadFragment(f: Fragment): HtmlContainer {
-        return elements.addAndReturn(f)
+    fun loadFragment(f: Fragment): Fragment {
+        elements.add(f)
+        return f
     }
 
     fun addTextBlock(rawText: String, encode: Boolean): HtmlContainer {
