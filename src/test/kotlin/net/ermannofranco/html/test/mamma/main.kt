@@ -11,19 +11,19 @@ fun main() {
         scriptLinks("script/stuHover.js", "script/ajax_base.js")
         div().addA("top")
         val cells = table(width = "95%", border = 3).addRow(2)
-        cells[0].loadFragment(Menu())
+        cells[0].loadFragment(Menu(doc))
 
 
         val list = cells[1].addList(id = "list1")
         list.addItems("ciao", "ottjkgo&&&", "....>>>novvvve   <")
-        loadFragment(Footer())
+        loadFragment(Footer(doc))
     }
 
 
     doc.save("sito/file1.htm")
 }
 
-class Menu : Fragment() {
+class Menu(doc: Doc) : Fragment(doc) {
     init {
         span(className = "preload1")
         span(className = "preload2")
@@ -34,7 +34,7 @@ class Menu : Fragment() {
     }
 }
 
-class Footer : Fragment() {
+class Footer(doc: Doc) : Fragment(doc) {
     init {
         val list = table(width = "100%").addRow(3)
         list.forEachIndexed { index, cell -> cell.addTextBlock(index.toString(), true) }

@@ -8,11 +8,12 @@ package net.ermanno.html
  * definiti in HtmlContainer
  */
 open class ContainerTag internal constructor(
+    doc: Doc,
     htmlName: String,
     id: String? = null,
     className: String? = null,
 ) :
-    StandardTag(htmlName, id, className, closingTag = true), HtmlContainer {
+    StandardTag(doc, htmlName, id, className, closingTag = true), HtmlContainer {
 
     final override val elements: MutableList<in HtmlElem> = mutableListOf()
 
@@ -175,20 +176,20 @@ open class ContainerTag internal constructor(
      * @return il riferimento al tag
      */
     fun addSelect(id: String? = null, className: String? = null): Select {
-        return elements.addAndReturn(Select(id, className))
+        return elements.addAndReturn(Select(doc, id, className))
     }
 
 }
 
-abstract class Block internal constructor(htmlName: String, id: String? = null, className: String? = null) :
-    ContainerTag(htmlName, id, className) {
+abstract class Block internal constructor(doc: Doc, htmlName: String, id: String? = null, className: String? = null) :
+    ContainerTag(doc, htmlName, id, className) {
     fun addA(
         id: String? = null,
         className: String? = null,
         href: String? = null,
         text: (() -> String)? = null
     ): ContainerTag {
-        val ct = ContainerTag("a", id, className)
+        val ct = ContainerTag(doc,"a", id, className)
         if (href != null) {
             ct.addAttribute("href", href)
         }
@@ -197,5 +198,7 @@ abstract class Block internal constructor(htmlName: String, id: String? = null, 
     }
 }
 
-class Div internal constructor(id: String? = null, className: String? = null) : Block("div", id, className)
-class P internal constructor(id: String? = null, className: String? = null) : Block("p", id, className)
+class Div internal constructor(doc: Doc, id: String? = null, className: String? = null) :
+    Block(doc, "div", id, className)
+
+class P internal constructor(doc: Doc, id: String? = null, className: String? = null) : Block(doc, "p", id, className)

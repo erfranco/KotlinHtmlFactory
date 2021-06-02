@@ -1,15 +1,17 @@
 package net.ermanno.html
 
 abstract class AbstractList(
+    doc: Doc,
     htmlName: String, id: String? = null,
     className: String? = null,
 ) : ContainerTag(
+    doc,
     htmlName, id,
     className
 ) {
     fun addItems(vararg s: String): ContainerTag {
         s.forEach {
-            val item = ListItem(it)
+            val item = ListItem(doc, it)
             elements.add(item)
         }
         return this
@@ -19,17 +21,18 @@ abstract class AbstractList(
         id: String? = null,
         className: String? = null
     ): ListItem {
-        return elements.addAndReturn(ListItem(id = id, className = className))
+        return elements.addAndReturn(ListItem(doc, id = id, className = className))
     }
 }
 
 internal class OrderedList(
+    doc: Doc,
     id: String? = null,
     className: String? = null,
     /* deprecated val start: Int = 0,
     val oltype: OLTYPE = OLTYPE.NUMBER*/
 ) : AbstractList(
-    "ol", id, className
+    doc, "ol", id, className
 ) //{
 /*    init {
         { start > 0 }.let { addAttribute("start", start.toString()) }
@@ -38,17 +41,19 @@ internal class OrderedList(
 //}
 
 internal class UnorderedList(
+    doc: Doc,
     id: String? = null,
     className: String? = null,
 ) : AbstractList(
-    "ul", id, className
+    doc, "ul", id, className
 )
 
 class ListItem internal constructor(
+    doc: Doc,
     text: String? = null,
     id: String? = null,
     className: String? = null
-) : Block("li", id, className) {
+) : Block(doc, "li", id, className) {
     init {
         text?.let { addTextBlock(text, true) }
     }

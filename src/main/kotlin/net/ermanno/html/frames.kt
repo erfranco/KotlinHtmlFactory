@@ -6,13 +6,13 @@ enum class Scroll { YES, NO, AUTO }
  *
  * @author  ermanno
  */
-class FrameSet internal constructor(val cols: String?, val rows: String?) :
-    ContainerTag("frameset") {
+class FrameSet internal constructor(doc: Doc, val cols: String?, val rows: String?) :
+    ContainerTag(doc, "frameset") {
 
     private val frames = mutableListOf<SingleTag>()
 
     fun addFrameset(cols: String?, rows: String?): FrameSet {
-        val frset = FrameSet(cols, rows)
+        val frset = FrameSet(doc, cols, rows)
         frames.add(frset)
         return frset
     }
@@ -24,7 +24,7 @@ class FrameSet internal constructor(val cols: String?, val rows: String?) :
 
 
     fun addFrame(nome: String?, src: String, scrolling: Scroll = Scroll.AUTO): Frame {
-        val fr = Frame(nome, src, scrolling)
+        val fr = Frame(doc, nome, src, scrolling)
         frames.add(fr)
         return fr
     }
@@ -55,8 +55,8 @@ class FrameSet internal constructor(val cols: String?, val rows: String?) :
  *
  * @author  ermanno
  */
-class Frame internal constructor(name: String?, val src: String, val scrolling: Scroll) :
-    SingleTag("frame", name) {
+class Frame internal constructor(doc: Doc, name: String?, val src: String, val scrolling: Scroll) :
+    SingleTag(doc, "frame", name) {
     fun setNoresize(): Frame {
         addAttribute("noresize", "true")
         return this

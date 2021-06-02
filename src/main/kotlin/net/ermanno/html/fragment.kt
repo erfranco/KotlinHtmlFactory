@@ -1,6 +1,6 @@
 package net.ermanno.html
 
-open class Fragment : HtmlContainer {
+open class Fragment(final override val doc: Doc) : HtmlContainer {
 
     final override val elements: MutableList<in HtmlElem> = mutableListOf()
 
@@ -11,8 +11,8 @@ open class Fragment : HtmlContainer {
     }
 }
 
-class TextFragment(val text: String) : Fragment() {
+class TextFragment(doc: Doc, val text: String) : Fragment(doc) {
     init {
-        elements.add(TextTag(text, true))
+        elements.add(TextTag(doc, text, true))
     }
 }

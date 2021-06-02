@@ -5,8 +5,9 @@ import java.util.*
 
 const val W3CSS = "https://www.w3schools.com/w3css/4/w3.css"
 
-enum class BodyEvent(private val event: String): HtmlEvent {
+enum class BodyEvent(private val event: String) : HtmlEvent {
     ONLOAD("onload"), ONUNLOAD("onunload");
+
     override fun smallName(): String {
         return event
     }
@@ -28,10 +29,11 @@ enum class ROBOTS(val value: String) { INDEX("index"), NOINDEX("noindex"), FOLLO
  */
 open class Doc(
     private val title: String = "null",
-    private val doctype: DocType = DocType.CLASSIC,
+    internal val doctype: DocType = DocType.CLASSIC,
     private val charset: Charset = Charset.UTF8
 ) : HtmlContainer {
 
+    final override val doc: Doc = this
     final override val elements: MutableList<in HtmlElem> = mutableListOf()
     private var flagFrameset = false
     private val links = mutableListOf<Tag>()
@@ -98,12 +100,12 @@ open class Doc(
 
 
     /** imposta un tag link ad un foglio di stile esterno
-     * @param UrlCSS l'indirizzo url del file di stile
+     * @param cssUrl l'indirizzo url del file di stile
      * @return un riferimento al documento
      */
     fun cssLink(cssUrl: String): Doc {
         links.add(
-            StandardTag("link", closingTag = false)
+            StandardTag(this, "link", closingTag = false)
                 .addAttributes("rel" to "stylesheet", "type" to "text/css", "href" to cssUrl)
         )
         return this
@@ -115,7 +117,8 @@ open class Doc(
     }
 
     /** imposta l'evento innescato a fine caricamento pagina
-     * @param funzione la stringa che richiama il codice evento (es. "faiAzione()")
+     * @param type
+     * @param func la stringa che richiama il codice evento (es. "faiAzione()")
      * @return un riferimento al documento
      */
     fun event(type: BodyEvent, func: String): Doc {
@@ -142,13 +145,6 @@ open class Doc(
         return this
     }
 
-    /** metodo factory generico che crea un ContainerTag e lo aggiunge all'oggetto
-     * documento
-     * @param htmlName
-     * @param id
-     * @param className
-     * @return un ContainerTag
-     */
 /*    override fun addContainerTag(htmlName: String, id: String?, className: String?): ContainerTag {
         val ct = ContainerTag(htmlName, id, className)
         elements.add(ct)
@@ -224,13 +220,13 @@ open class Doc(
             sb.append(it)
         }
         stiliFile.forEach {
-            val stile = ContainerTag("style")
+            val stile = ContainerTag(this, "style")
             stile.addAttribute("type", "text/css")
             stile.addTextBlock(it, false)
             sb.append(stile)
         }
         if (stili.isNotEmpty()) {
-            val stile = ContainerTag("style")
+            val stile = ContainerTag(this, "style")
             stile.addAttribute("type", "text/css")
             stili.forEach {
                 stile.addTextBlock("\n${it.first} {${it.second}}", false)
@@ -238,7 +234,7 @@ open class Doc(
             sb.append(stile)
         }
         scriptReferences.forEach {
-            val ref = StandardTag("script", closingTag = true)
+            val ref = StandardTag(this, "script", closingTag = true)
             ref.addAttributes("src" to it.first, "type" to it.second)
             sb.append(ref)
         }
@@ -287,7 +283,7 @@ open class Doc(
      */
     fun setFrameset(cols: String, rows: String?): FrameSet {
         flagFrameset = true
-        val frset = FrameSet(cols, rows)
+        val frset = FrameSet(doc, cols, rows)
         //elimina tutto;
         elements.clear()
         elements.add(frset)
@@ -300,7 +296,7 @@ open class Doc(
      */
     fun addMetaDescription(description: String): Doc {
         metas.add(
-            StandardTag("meta", "description", closingTag = false).addAttribute(
+            StandardTag(this, "meta", "description", closingTag = false).addAttribute(
                 "content",
                 description
             )
@@ -314,7 +310,7 @@ open class Doc(
      */
     fun addMetaKeywords(description: String): Doc {
         metas.add(
-            StandardTag("meta", "keywords", closingTag = false).addAttribute(
+            StandardTag(this, "meta", "keywords", closingTag = false).addAttribute(
                 "content",
                 description
             )
@@ -327,7 +323,7 @@ open class Doc(
      * @return
      */
     fun setMetaRobots(robot: ROBOTS): Doc {
-        metas.add(StandardTag("meta", "robots", closingTag = false).addAttribute("content", robot.value))
+        metas.add(StandardTag(this, "meta", "robots", closingTag = false).addAttribute("content", robot.value))
         return this
     }
 
@@ -337,7 +333,7 @@ open class Doc(
      */
     fun addMetaExpires(expires: String): Doc {
         metas.add(
-            StandardTag("meta", closingTag = false)
+            StandardTag(this, "meta", closingTag = false)
                 .addAttributes("http-equiv" to "expires", "content" to expires)
         )
         return this
@@ -350,7 +346,7 @@ open class Doc(
      */
     fun addMetaRefresh(seconds: Int, URLRedirect: String): Doc {
         metas.add(
-            StandardTag("meta", closingTag = false)
+            StandardTag(this, "meta", closingTag = false)
                 .addAttributes(
                     "http-equiv" to "refresh",
                     "content" to if (URLRedirect.isEmpty()) "$seconds" else "$seconds; url=$URLRedirect"
@@ -365,7 +361,7 @@ open class Doc(
      */
     fun addMetaLanguage(language: String): Doc {
         metas.add(
-            StandardTag("meta", "language", closingTag = false)
+            StandardTag(this, "meta", "language", closingTag = false)
                 .addAttribute("content", language)
         )
         return this

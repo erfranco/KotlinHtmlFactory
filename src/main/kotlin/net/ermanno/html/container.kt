@@ -1,7 +1,7 @@
 package net.ermanno.html
 
 //convenience extension function
-fun <T: HtmlElem> MutableList<in T>.addAndReturn(elem: T): T {
+fun <T : HtmlElem> MutableList<in T>.addAndReturn(elem: T): T {
     this.add(elem)
     return elem
 }
@@ -20,7 +20,7 @@ interface HtmlContainer : HtmlElem {
     }
 
     fun addTextBlock(rawText: String, encode: Boolean): HtmlContainer {
-        elements.add(TextTag(rawText, encode))
+        elements.add(TextTag(doc, rawText, encode))
         return this
     }
 
@@ -47,7 +47,7 @@ interface HtmlContainer : HtmlElem {
         className: String? = null,
         text: (() -> String)? = null
     ): Div {
-        val div = Div(id, className)
+        val div = Div(doc, id, className)
         if (text != null) div.addTextBlock(text(), true)
         return elements.addAndReturn(div)
     }
@@ -57,7 +57,12 @@ interface HtmlContainer : HtmlElem {
         className: String? = null,
         text: (() -> String)? = null
     ): ContainerTag {
-        val span = ContainerTag("span", id, className)
+        if (doc.doctype == DocType.XHTML_STRICT || doc.doctype == DocType.XHTML1_1) {
+            if (this == doc || Fragment::class.isInstance(this)) throw HtmlException(
+                "span not allowed at first level when XHTML_STRICT or XHTML1_1"
+            )
+        }
+        val span = ContainerTag(doc, "span", id, className)
         if (text != null) span.addTextBlock(text(), true)
         return elements.addAndReturn(span)
     }
@@ -67,7 +72,7 @@ interface HtmlContainer : HtmlElem {
         className: String? = null,
         text: (() -> String)? = null
     ): ContainerTag {
-        val p = P(id, className)
+        val p = P(doc, id, className)
         if (text != null) p.addTextBlock(text(), true)
         return elements.addAndReturn(p)
     }
@@ -78,11 +83,11 @@ interface HtmlContainer : HtmlElem {
         className: String? = null,
         closingTag: Boolean = true
     ): StandardTag {
-        return elements.addAndReturn(StandardTag(htmlName, id, className, closingTag))
+        return elements.addAndReturn(StandardTag(doc, htmlName, id, className, closingTag))
     }
 
     fun addContainerTag(htmlName: String, id: String? = null, className: String? = null): ContainerTag {
-        return elements.addAndReturn(ContainerTag(htmlName, id, className))
+        return elements.addAndReturn(ContainerTag(doc, htmlName, id, className))
     }
 
     fun addContainerTag(tag: ContainerTag): ContainerTag {
@@ -90,11 +95,11 @@ interface HtmlContainer : HtmlElem {
     }
 
     fun table(id: String? = null, className: String? = null, width: String? = null, border: Int? = null): Table {
-        return elements.addAndReturn(Table(id, className, width, border))
+        return elements.addAndReturn(Table(doc, id, className, width, border))
     }
 
-    fun addForm(methodType: METHOD = METHOD.GET, id: String? = null, className: String? = null): Form {
-        return elements.addAndReturn(Form(id, className, methodType))
+    fun addForm(methodType: Method = Method.GET, id: String? = null, className: String? = null): Form {
+        return elements.addAndReturn(Form(doc, id, className, methodType))
     }
 
     /**
@@ -108,7 +113,7 @@ interface HtmlContainer : HtmlElem {
 /*        deprecated oltype: OLTYPE = OLTYPE.NUMBER,
         firstValue: Int = 0,*/
     ): AbstractList {
-        val ct = if (ordered) OrderedList(id, className) else UnorderedList(id, className)
+        val ct = if (ordered) OrderedList(doc, id, className) else UnorderedList(doc, id, className)
         return elements.addAndReturn(ct)
     }
 }

@@ -1,7 +1,7 @@
 package net.ermanno.html
 
 enum class Align { CENTER, LEFT, RIGHT }
-enum class METHOD { GET, POST, PUT }
+enum class Method { GET, POST, PUT }
 
 enum class FormEvent(private val event: String) : HtmlEvent {
     FOCUS("onfocus"), BLUR("onblur"), CHANGE("onchange"), INPUT("oninput"),
@@ -21,8 +21,8 @@ class Table
  * @param id
  * @param classname
  */
-internal constructor(id: String?, classname: String?, val width: String? = null, border: Int? = null) :
-    ContainerTag("table", id, classname) {
+internal constructor(doc: Doc, id: String?, classname: String?, private val width: String? = null, border: Int? = null) :
+    ContainerTag(doc, "table", id, classname) {
 
     private var align = Align.CENTER
 
@@ -55,7 +55,7 @@ internal constructor(id: String?, classname: String?, val width: String? = null,
     }
 
     fun addRow(id: String? = null, classname: String? = null): Row {
-        return elements.addAndReturn(Row(id, classname))
+        return elements.addAndReturn(Row(doc, id, classname))
     }
 
     fun setAlign(align: Align) {
@@ -80,8 +80,8 @@ class Row
  * @param id
  * @param classname
  */
-internal constructor(id: String?, classname: String?) :
-    ContainerTag("tr", id, classname) {
+internal constructor(doc: Doc, id: String?, classname: String?) :
+    ContainerTag(doc, "tr", id, classname) {
     //crea una cella senza niente
     /** aggiunge un oggetto cella
      * @return l'oggetto cella
@@ -114,12 +114,12 @@ internal constructor(id: String?, classname: String?) :
      * @return l'oggetto cella
      */
     fun addCell(text: String?, id: String?, classname: String?): Cell {
-        val cell = Cell(text, id, classname)
+        val cell = Cell(doc, text, id, classname)
         return elements.addAndReturn(cell)
     }
 
     fun addCell(colspan: Int): Cell {
-        val cell = Cell(null, null, null)
+        val cell = Cell(doc, null, null, null)
         cell.addAttribute("colspan", "$colspan")
         return elements.addAndReturn(cell)
     }
@@ -135,11 +135,12 @@ internal constructor(id: String?, classname: String?) :
  * @author ermanno
  */
 class Cell internal constructor(
+    doc: Doc,
     rawText: String?,
     id: String?,
     classname: String?,
 ) :
-    Block("td", id, classname) {
+    Block(doc, "td", id, classname) {
     init {
         if (rawText != null) {
             addTextBlock(rawText, true)
@@ -152,11 +153,12 @@ class Cell internal constructor(
  * @author ermanno
  */
 class Form internal constructor(
+    doc: Doc,
     id: String?,
-    classname: String?,
-    methodType: METHOD = METHOD.GET,
+    className: String?,
+    methodType: Method = Method.GET,
 ) :
-    ContainerTag("form", id, classname) {
+    ContainerTag(doc, "form", id, className) {
     init {
         setMethod(methodType)
     }
@@ -166,8 +168,8 @@ class Form internal constructor(
      * Costante di Form
      * @return un riferimento a se stesso
      */
-    fun setMethod(methodType: METHOD): Form {
-        addAttribute("method", methodType.toString())
+    fun setMethod(methodType: Method): Form {
+        addAttribute("method", methodType.name.lowercase())
         return this
     }
 
@@ -189,14 +191,14 @@ class Select
  * @param id
  * @param classname
  */
-internal constructor(id: String?, classname: String?) :
-    ContainerTag("select", id, classname) {
+internal constructor(doc: Doc, id: String?, classname: String?) :
+    ContainerTag(doc, "select", id, classname) {
     /** metodo factory che inserisce un tag OPTION
      * @param value il valore del tag OPTION (non il nome!!!)
      * @return un tag OPTION
      */
     fun addOption(value: String, text: String): Select {
-        val option = ContainerTag("option")
+        val option = ContainerTag(doc, "option")
         option.addAttribute("value", value)
         option.addTextBlock(text, true)
         elements.add(option)
@@ -204,7 +206,7 @@ internal constructor(id: String?, classname: String?) :
     }
 
     fun addSelectedOption(value: String, text: String): Select {
-        val option = ContainerTag("option")
+        val option = ContainerTag(doc, "option")
         option.addAttribute("value", value).addAttribute("selected", "selected")
         option.addTextBlock(text, true)
         elements.add(option)
@@ -212,16 +214,12 @@ internal constructor(id: String?, classname: String?) :
     }
 }
 
-class TextTag(rawText: String, encode: Boolean) : HtmlElem {
-    private val text: String
-
-
+class TextTag(override val doc: Doc, rawText: String, encode: Boolean) : HtmlElem {
+    private val text: String = if (encode) StringUtils.encodeHtml(rawText) else rawText
+    
     override fun toString(): String {
         return text
     }
 
-    init {
-        text = if (encode) StringUtils.encodeHtml(rawText) else rawText
-    }
 }
 

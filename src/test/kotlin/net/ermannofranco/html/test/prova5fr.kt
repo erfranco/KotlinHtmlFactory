@@ -1,12 +1,13 @@
 package net.ermannofranco.html.test
 
+import net.ermanno.html.Doc
 import net.ermanno.html.Fragment
 import net.ermanno.html.MouseEvent
 
-class Prova5(val text: String) : Fragment() {
+class Prova5(doc: Doc, val text: String) : Fragment(doc) {
 
     init {
-        span { text }
+        div().span { text }
         addP()
         div("div1") { "Questo e' il testo" }
         val div = div(className = "uno")

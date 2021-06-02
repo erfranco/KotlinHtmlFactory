@@ -36,7 +36,9 @@ private data class HtmlClass(val className: String) : Serializable {
     }
 }
 
-interface HtmlElem : Serializable
+interface HtmlElem : Serializable {
+    val doc: Doc
+}
 
 interface Tag : HtmlElem {
 
@@ -120,21 +122,17 @@ interface Tag : HtmlElem {
  * @author ermanno
  */
 open class SingleTag protected constructor(
+    final override val doc: Doc,
     htmlName: String,
-    val id: String? = null,
+    private val id: String? = null,
     htmlClass: String? = null,
 ) :
     Tag {
 
-    final override val htmlName: String
+    final override val htmlName: String = htmlName.lowercase(Locale.getDefault())
     final override val attributes: MutableMap<String, String> = mutableMapOf()
     final override val events: MutableMap<String, String> = mutableMapOf()
-    private val htmlClass: HtmlClass?
-
-    init {
-        this.htmlName = htmlName.lowercase(Locale.getDefault())
-        this.htmlClass = htmlClass?.let { HtmlClass(htmlClass) }
-    }
+    private val htmlClass: HtmlClass? = htmlClass?.let { HtmlClass(htmlClass) }
 
     /** imposta l'attributo style
      * @param stylename la stringa di stile es. "color:#12345;font: bold 16 Antiqua"
@@ -178,12 +176,13 @@ open class SingleTag protected constructor(
  * definiti in HtmlContainer
  */
 open class StandardTag internal constructor(
+    doc: Doc,
     htmlName: String,
     id: String? = null,
     htmlClass: String? = null,
     val closingTag: Boolean = false,
 ) :
-    SingleTag(htmlName, id, htmlClass) {
+    SingleTag(doc, htmlName, id, htmlClass) {
 
     /** protetto, stampa tutto senza il tag di chiusura
      * @return stampa tutto senza il tag di chiusura

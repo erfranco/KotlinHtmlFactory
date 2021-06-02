@@ -60,7 +60,7 @@ class Prova {
         docu.addStyleTag("span", "color:blue;font-size:24px")
         docu.addStyleTag("input.pippo", "color:aqua;font-size:24px")
         //docu.addCSSLink("Pippo.css").setOnLoadEvent("minnie()")
-        val form = docu.addForm(METHOD.POST, id = "form").setAction("http://www.jolie.it/csea")
+        val form = docu.addForm(Method.POST, id = "form").setAction("http://www.jolie.it/csea")
         form.addButton("CLICCA!")//.addClass("pippo").addEvent("onClick", "pluto()")
         form.addCheckboxInput("check", checked = true).event(MouseEvent.CLICK, "orazio()")
         val spanUno = form.span("uno") { "selezionato" }
