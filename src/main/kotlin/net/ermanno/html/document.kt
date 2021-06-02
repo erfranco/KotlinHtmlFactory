@@ -199,8 +199,8 @@ open class Doc(
             println("File $fileName salvato.")
             return true
         } catch (e: Exception) {
-            println("Warning: $e.")
-            return false
+            println("Failed: $e.")
+            throw e
         }
     }
 
@@ -208,6 +208,7 @@ open class Doc(
      * @return stampa tutto
      */
     override fun toString(): String {
+        checkConsistency()
         //var languageScript: String? = null
         val sb = StringBuilder().append(stringDoctype)
             .append("\n<head>")
@@ -266,14 +267,23 @@ open class Doc(
         sb.append("\n<!-- PAGINA GENERATA AUTOMATICAMENTE DA CODICE KOTLIN che usa la libreria HtmlFactory -->")
         sb.append(
             """
-<!-- AUTORE DELLA LIBRERIA HtmlFactory:$AUTHOR ($EMAIL) -->"""
+<!-- AUTORE DELLA LIBRERIA HtmlFactory:$AUTHOR ($EMAIL) -->""".trimIndent()
         )
         sb.append(
             """
-<!-- Data generazione: ${Date()} -->"""
+<!-- Data generazione: ${Date()} -->""".trimIndent()
         )
         sb.append("\n</html>")
         return sb.toString()
+    }
+
+    private fun checkConsistency() {
+        if (doctype == DocType.XHTML_FRAMESET || doctype == DocType.CLASSIC_FRAMESET){
+            if (!flagFrameset) {
+                //println("FAILED: Doctype allows only framesets")
+                throw HtmlException("Doctype allows only framesets")
+            }
+        }
     }
 
     /**
@@ -294,7 +304,7 @@ open class Doc(
      * @param description
      * @return
      */
-    fun addMetaDescription(description: String): Doc {
+    fun metaDescription(description: String): Doc {
         metas.add(
             StandardTag(this, "meta", "description", closingTag = false).addAttribute(
                 "content",
@@ -308,7 +318,7 @@ open class Doc(
      * @param description
      * @return
      */
-    fun addMetaKeywords(description: String): Doc {
+    fun metaKeywords(description: String): Doc {
         metas.add(
             StandardTag(this, "meta", "keywords", closingTag = false).addAttribute(
                 "content",

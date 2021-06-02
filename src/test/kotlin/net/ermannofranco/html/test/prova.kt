@@ -17,8 +17,8 @@ class Prova {
     init {
         val docu = Doc("Ciao da HtmlFactory", doctype = DocType.CLASSIC)
         //docu.addScriptReference("../script/Pippo.js")
-        docu.addMetaDescription("pagina personale")
-            .addMetaKeywords("pippo,pluto")
+        docu.metaDescription("pagina personale")
+            .metaKeywords("pippo,pluto")
             .addMetaLanguage("it,en")
         //.addMetaRefresh(10, "www.pippo.com")
         try {

@@ -16,7 +16,7 @@ fun main() {
 
 class Prova4(val text: String) {
 
-    val doc = Doc("Prova4 - vediamo", DocType.XHTML_TRANSITIONAL, charset = Charset.ISO8859_1)
+    val doc = Doc("Prova4 - vediamo", DocType.CLASSIC_FRAMESET, charset = Charset.ISO8859_1)
 
     init {
         with(doc) {
